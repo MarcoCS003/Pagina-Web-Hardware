@@ -2,16 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 function ProductDetail() {
-  const { id } = useParams(); // Obtenemos el ID del producto desde la URL
+  const { id } = useParams();
   const [producto, setProducto] = useState(null);
+  const [mainImage, setMainImage] = useState(1);
 
-  // Cargar detalles del producto desde el JSON
   useEffect(() => {
-    fetch('/productos.json') // Asegúrate de que el archivo esté en la carpeta 'public'
+    fetch(`http://localhost:3005/productos`)
       .then(response => response.json())
       .then(data => {
-        const foundProduct = data.productos.find(p => p.id === parseInt(id));
-        setProducto(foundProduct); // Establecemos el producto encontrado
+        const foundProduct = data.find(p => p.id === id);
+        setProducto(foundProduct);
       })
       .catch(error => console.error("Error cargando producto:", error));
   }, [id]);
@@ -20,18 +20,26 @@ function ProductDetail() {
     return <p>Cargando...</p>;
   }
 
+  const imageUrls = Array.from({ length: 5 }, (_, i) => 
+    `http://localhost/dolibar/dolibarr-20.0.1/dolibarr-20.0.1/htdocs/document.php?modulepart=produit&entity=1&file=${producto.ref}%2F${producto.ref}${i + 1}.png`
+  );
+
+  // Calcular costo de envío
+  const envio = producto.price > 1000 ? 'Envío gratis' : '$90 de envío';
+
   return (
     <div style={{
       display: 'flex',
-      justifyContent: 'center', // Centra el contenedor principal horizontalmente
-      alignItems: 'center',     // Centra el contenedor principal verticalmente
-      minHeight: '10vh',       // Ocupa toda la altura de la pantalla
+      justifyContent: 'center',
+      alignItems: 'center',   
+      minHeight: '10vh',
       padding: '20px',
       boxSizing: 'border-box'
     }}>
       <div style={{
         display: 'flex',
-        maxWidth: '900px',       // Limita el ancho máximo del contenedor
+        flexDirection: 'column',
+        maxWidth: '900px', 
         width: '100%',
         gap: '20px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
@@ -39,55 +47,77 @@ function ProductDetail() {
         borderRadius: '10px',
         backgroundColor: '#fff'
       }}>
-        {/* Imagen del producto */}
-        <div style={{
-          width: '50%',
-          height: '400px',
-          backgroundColor: '#f0f0f0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: '8px'
-        }}>
-          <p>Imagen del Producto</p>
+        <div style={{ display: 'flex', gap: '20px' }}>
+          {/* Imagen principal del producto */}
+          <div style={{
+            width: '50%',
+            height: '400px',
+            backgroundColor: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '8px'
+          }}>
+            <img src={imageUrls[mainImage - 1]} alt={producto.nombre} style={{ maxWidth: '100%', maxHeight: '100%' }} />
+          </div>
+
+          {/* Información del producto */}
+          <div style={{ width: '50%' }}>
+            <h1>{producto.ref}</h1>
+            <p style={{ fontSize: '1.5em', color: '#007bff' }}>${Math.round(producto.price)}</p>
+            <p><strong>Stock:</strong> {producto.stock_reel} disponibles</p>
+            <p><strong>Costo de envío:</strong> {envio}</p>
+            
+            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+              <button style={{
+                padding: '10px 20px',
+                fontSize: '1em',
+                backgroundColor: '#28a745',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer'
+              }}>
+                Comprar Ahora
+              </button>
+              <button style={{
+                padding: '10px 20px',
+                fontSize: '1em',
+                backgroundColor: '#007bff',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer'
+              }}>
+                Añadir a Carrito
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Detalles del producto */}
-        <div style={{ width: '50%' }}>
-          <h1>{producto.nombre}</h1>
-          <p>{producto.descripcion}</p>
-          <p style={{ fontSize: '1.5em', color: '#007bff' }}>${producto.precio}</p>
-          
-          <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-            <button style={{
-              padding: '10px 20px',
-              fontSize: '1em',
-              backgroundColor: '#28a745',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}>
-              Comprar Ahora
-            </button>
-            <button style={{
-              padding: '10px 20px',
-              fontSize: '1em',
-              backgroundColor: '#007bff',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}>
-              Añadir a Carrito
-            </button>
-          </div>
+        {/* Miniaturas de imágenes */}
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '10px' }}>
+          {imageUrls.map((url, index) => (
+            <img 
+              key={index} 
+              src={url} 
+              alt={`Miniatura ${index + 1}`} 
+              style={{
+                width: '60px',
+                height: '60px',
+                cursor: 'pointer',
+                border: mainImage === index + 1 ? '2px solid #007bff' : '1px solid #ccc',
+                borderRadius: '5px'
+              }}
+              onClick={() => setMainImage(index + 1)}
+            />
+          ))}
+        </div>
 
-          {/* Detalles adicionales */}
-          <div style={{ marginTop: '20px' }}>
-            <p><strong>Marca:</strong> {producto.marca}</p>
-            <p><strong>Stock:</strong> {producto.stock} disponibles</p>
-          </div>
+        {/* Características del producto (Descripción) */}
+        <div style={{ marginTop: '20px', fontSize: '0.9em' }}>
+          <h2>Características del producto</h2>
+          <div dangerouslySetInnerHTML={{ __html: producto.description }} />
         </div>
       </div>
     </div>

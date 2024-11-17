@@ -4,11 +4,13 @@ import About from './About';
 import Sidebar from './Sidebar'; // Importamos la barra lateral
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { useState, useEffect } from 'react';
 import ProductDetail from './ProductDetail';
 import Cart from './Cart';
+import IniciarSesion from './Iniciar-sesion'
+import Registro from './Registro';
+import DataUser from './DataUser';
 
 function App() {
   return (
@@ -25,7 +27,7 @@ function App() {
               <li><a href="/contacto">Contacto</a></li>
               <li><a href="/aviso-privacidad">Aviso de Privacidad</a></li>
               <li><a href="/politica-garantia">Política de Garantía</a></li>
-              <li><a href="/iniciar-sesion">Iniciar Sesión</a></li>
+              <li><a href="/Iniciar-sesion">Iniciar Sesión</a></li>
               <li className="carrito">
                 <a href="/carrito">Carrito</a>
               </li>
@@ -39,9 +41,12 @@ function App() {
           <Route path="/acerca-de" element={<About />} />
           <Route path="/aviso-privacidad" element={<AvisoPrivacidad />} />
           <Route path="/politica-garantia" element={<PoliticaGarantia />} />
-          <Route path="/iniciar-sesion" element={<IniciarSesion />} />
+          <Route path="/Iniciar-sesion" element={<IniciarSesion />} />
           <Route path="/carrito" element={<Cart />} /> {/* Ruta para el carrito */}
           <Route path="/producto/:id" element={<ProductDetail />} />
+          <Route path="/registro" element={<Registro />} />
+          <Route path="/datauser" element={<DataUser />}/>
+
         </Routes>
       </div>
     </Router>
@@ -97,39 +102,40 @@ function Home() {
     </main>
   );
 }
-
-// Componente para la página de productos con la barra lateral
 function ProductsPage() {
   const [productos, setProductos] = useState([]);
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('Procesadores');
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
   const [productosFiltrados, setProductosFiltrados] = useState([]);
 
-  
   useEffect(() => {
-    fetch('/productos.json') 
+    fetch('http://localhost:3005/productos')
       .then(response => response.json())
-      .then(data => setProductos(data.productos))
+      .then(data => setProductos(data)) 
       .catch(error => console.error("Error cargando productos:", error));
   }, []);
 
   useEffect(() => {
     setProductosFiltrados(
-      productos.filter(producto => producto.categoria === categoriaSeleccionada)
+      productos.filter(producto => producto.label === categoriaSeleccionada)
     );
   }, [categoriaSeleccionada, productos]);
 
   return (
     <div style={{ display: 'flex' }}>
-      {/* Barra lateral con filtro de categorías */}
+      {/* Sidebar con ancho fijo */}
       <Sidebar setCategoriaSeleccionada={setCategoriaSeleccionada} />
 
-      {/* Sección de productos */}
-      <main style={{ marginLeft: '50px', marginTop: '5px', padding: '20px' }}>
-        <h1>Productos - {categoriaSeleccionada}</h1>
+      <main style={{
+        flexGrow: 1, // Ocupa el espacio restante al lado del sidebar
+        marginLeft: '50px',
+        marginTop: '5px',
+        padding: '20px'
+      }}>
+        <h1>Productos - {categoriaSeleccionada || "Todas las categorías"}</h1>
         <p>Aquí puedes encontrar diferentes componentes para computadoras.</p>
 
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-          {productosFiltrados.map(producto => (
+          {(productosFiltrados.length > 0 ? productosFiltrados : productos).map(producto => (
             <ProductCard key={producto.id} producto={producto} />
           ))}
         </div>
@@ -137,6 +143,7 @@ function ProductsPage() {
     </div>
   );
 }
+
 
 
 
@@ -186,6 +193,7 @@ function Contacto() {
     </div>
   );
 }
+
 function AvisoPrivacidad() {
   return (
     <div style={{ padding: '50px', maxWidth: '800px', margin: 'auto' }}>
@@ -258,7 +266,6 @@ function PoliticaGarantia() {
       <ul style={{ fontSize: '1.2em', marginBottom: '20px', lineHeight: '1.8em' }}>
         <li>El producto no debe presentar daños físicos o alteraciones que no sean atribuibles al uso normal.</li>
         <li>Debe conservarse el comprobante de compra original.</li>
-        <li>El daño debe estar cubierto por la garantía del fabricante (defectos de fábrica, funcionamiento incorrecto, etc.).</li>
         <li>La garantía no cubre daños causados por accidentes, mal uso o modificaciones no autorizadas.</li>
       </ul>
 
@@ -297,83 +304,5 @@ function PoliticaGarantia() {
 }
 
 
-function IniciarSesion() {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh', backgroundColor: '#f5f5f5' }}>
-      <div style={{ padding: '40px', backgroundColor: '#fff', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', maxWidth: '400px', width: '100%' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Iniciar Sesión</h2>
-
-        {/* Entrada para el correo electrónico */}
-        <div style={{ marginBottom: '20px' }}>
-          <label htmlFor="email" style={{ fontSize: '1.1em', marginBottom: '8px', display: 'block' }}>Correo Electrónico:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Ingrese su correo"
-            style={{
-              width: '100%',
-              padding: '10px',
-              fontSize: '1em',
-              borderRadius: '5px',
-              border: '1px solid #ccc',
-              boxSizing: 'border-box'
-            }}
-          />
-        </div>
-
-        {/* Entrada para la contraseña */}
-        <div style={{ marginBottom: '20px' }}>
-          <label htmlFor="password" style={{ fontSize: '1.1em', marginBottom: '8px', display: 'block' }}>Contraseña:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Ingrese su contraseña"
-            style={{
-              width: '100%',
-              padding: '10px',
-              fontSize: '1em',
-              borderRadius: '5px',
-              border: '1px solid #ccc',
-              boxSizing: 'border-box'
-            }}
-          />
-        </div>
-
-        {/* Botón para continuar */}
-        <button
-          style={{
-            width: '100%',
-            padding: '10px',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '5px',
-            fontSize: '1.1em',
-            cursor: 'pointer',
-            marginBottom: '20px'
-          }}
-        >
-          Continuar
-        </button>
-
-        {/* Pregunta y botón para registrarse */}
-        <div style={{ textAlign: 'center', fontSize: '0.9em' }}>
-          <p>¿No tienes cuenta? <Link to="/registro" style={{ color: '#007bff', textDecoration: 'none' }}>Regístrate aquí</Link></p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Carrito() {
-  return (
-    <main>
-      <h1>Carrito de Compras</h1>
-      <p>Productos en el carrito.</p>
-    </main>
-  );
-}
-
 export default App;
+

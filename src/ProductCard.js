@@ -2,6 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 function ProductCard({ producto }) {
+  // Construye la URL de la imagen utilizando el campo 'ref' del producto
+  const imageUrl = 'http://54.204.75.162/dolibarr/htdocs/document.php?modulepart=produit&entity=1&file=Cooler_Master_Hyper_212%2FCooler_Master_Hyper_2121.png';
+
+
   return (
     <Link to={`/producto/${producto.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
       <div style={{
@@ -24,12 +28,16 @@ function ProductCard({ producto }) {
           alignItems: 'center',
           justifyContent: 'center'
         }}>
-          <p>Imagen</p>
+          <img 
+            src={imageUrl} 
+            style={{ maxHeight: '100%', maxWidth: '100%' }} 
+            alt="Producto" 
+          />
         </div>
         
         {/* Nombre y precio del producto */}
-        <h3 style={{ fontSize: '1.1em', margin: '10px 0' }}>{producto.nombre}</h3>
-        <p style={{ color: '#007bff', fontSize: '1.2em' }}>${producto.precio}</p>
+        <h3 style={{ fontSize: '1.1em', margin: '10px 0' }}>{producto.ref}</h3>
+        <p style={{ color: '#007bff', fontSize: '1.2em' }}>${Math.round(producto.price)}</p>
       </div>
     </Link>
   );
