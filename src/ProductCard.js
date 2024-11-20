@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 
 function ProductCard({ producto }) {
   // Construye la URL de la imagen utilizando el campo 'ref' del producto
-  const imageUrl = 'http://54.204.75.162/dolibarr/htdocs/document.php?modulepart=produit&entity=1&file=Cooler_Master_Hyper_212%2FCooler_Master_Hyper_2121.png';
+  const imageUrl = `http://54.204.75.162/dolibarr/htdocs/document.php?modulepart=produit&entity=1&file=${producto.ref}%2F${producto.ref}1.png`;
 
+  // Reemplazar los guiones bajos por espacios
+  const formattedName = producto.ref.replace(/_/g, ' ');
 
   return (
     <Link to={`/producto/${producto.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -36,7 +38,15 @@ function ProductCard({ producto }) {
         </div>
         
         {/* Nombre y precio del producto */}
-        <h3 style={{ fontSize: '1.1em', margin: '10px 0' }}>{producto.ref}</h3>
+        <h3 style={{
+          fontSize: '1em',
+          margin: '10px 0',
+          whiteSpace: 'nowrap', // Evitar que el texto se rompa
+          overflow: 'hidden',  // Ocultar el texto que exceda
+          textOverflow: 'ellipsis', // Mostrar "..." si el texto es demasiado largo
+        }}>
+          {formattedName}
+        </h3>
         <p style={{ color: '#007bff', fontSize: '1.2em' }}>${Math.round(producto.price)}</p>
       </div>
     </Link>

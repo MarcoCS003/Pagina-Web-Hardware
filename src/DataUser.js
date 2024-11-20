@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import UserDashboard from './UserDashboard';
+
 function DataUser() {
   const [token, setToken] = useState('');
 

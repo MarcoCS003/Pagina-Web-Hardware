@@ -6,22 +6,43 @@ function ProductDetail() {
   const [producto, setProducto] = useState(null);
   const [mainImage, setMainImage] = useState(1);
 
+  // Configuración de la API de Dolibarr
+  const DOLIBARR_API_URL = 'http://54.204.75.162/dolibarr/htdocs/api/index.php/products';
+  const DOLAPIKEY = 'U4B1Chw019IdhOQxJPVs52Jn5Iju37mn';
+
   useEffect(() => {
-    fetch(`http://localhost:3005/productos`)
-      .then(response => response.json())
-      .then(data => {
-        const foundProduct = data.find(p => p.id === id);
-        setProducto(foundProduct);
-      })
-      .catch(error => console.error("Error cargando producto:", error));
+    const fetchProducto = async () => {
+      try {
+        // Realizamos la solicitud para obtener los datos del producto por ID
+        const response = await fetch(`${DOLIBARR_API_URL}/${id}`, {
+          method: 'GET',
+          headers: {
+            'DOLAPIKEY': DOLAPIKEY,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al cargar el producto desde Dolibarr');
+        }
+
+        const data = await response.json();
+        setProducto(data); // Guardamos el producto en el estado
+      } catch (error) {
+        console.error('Error cargando producto:', error);
+      }
+    };
+
+    fetchProducto();
   }, [id]);
 
   if (!producto) {
     return <p>Cargando...</p>;
   }
 
+  // Generar URLs para imágenes
   const imageUrls = Array.from({ length: 5 }, (_, i) => 
-    `http://localhost/dolibar/dolibarr-20.0.1/dolibarr-20.0.1/htdocs/document.php?modulepart=produit&entity=1&file=${producto.ref}%2F${producto.ref}${i + 1}.png`
+    `http://54.204.75.162/dolibarr/htdocs/document.php?modulepart=produit&entity=1&file=${producto.ref}%2F${producto.ref}${i + 1}.png`
   );
 
   // Calcular costo de envío
@@ -58,7 +79,7 @@ function ProductDetail() {
             justifyContent: 'center',
             borderRadius: '8px'
           }}>
-            <img src={imageUrls[mainImage - 1]} alt={producto.nombre} style={{ maxWidth: '100%', maxHeight: '100%' }} />
+            <img src={imageUrls[mainImage - 1]} alt={producto.ref} style={{ maxWidth: '100%', maxHeight: '100%' }} />
           </div>
 
           {/* Información del producto */}
@@ -125,3 +146,4 @@ function ProductDetail() {
 }
 
 export default ProductDetail;
+

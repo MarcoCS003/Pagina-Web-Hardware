@@ -1,41 +1,58 @@
 import fetch from 'node-fetch';
 
-const testLogin = async () => {
+const DOLIBARR_API_URL = 'http://54.204.75.162/dolibarr/htdocs/api/index.php';
+const DOLAPIKEY = 'U4B1Chw019IdhOQxJPVs52Jn5Iju37mn'; // Reemplaza con tu clave de API
+
+const createOrderWithProducts = async () => {
+  const userId = 1; // ID del usuario (tercero) para la orden
+  const products = [
+    { fk_product: 19, qty: 2 }, // Producto 1
+    { fk_product: 66, qty: 1 }, // Producto 2
+    { fk_product: 62, qty: 3 }, // Producto 3
+  ];
+
   try {
-    console.log("Enviando solicitud de inicio de sesión...");
-    const response = await fetch('http://localhost:3005/api/auth/login', {
+    // Crear la orden con los productos incluidos
+    const orderResponse = await fetch(`${DOLIBARR_API_URL}/orders`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'DOLAPIKEY': DOLAPIKEY,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        email: 'prueba.usuario@example.com',   // Cambia a un correo de prueba registrado
-        password: 'contraseña'                // Cambia a la contraseña correspondiente (si es relevante)
-      })
+        socid: userId, // ID del tercero (usuario)
+        date: Math.floor(new Date().getTime() / 1000), // Fecha en formato timestamp
+        type: 0, // Tipo de pedido (0 para estándar)
+        lines: products, // Productos agregados directamente en la creación
+        mode_reglement_id: 6, // Método de pago
+        cond_reglement_id: 6, // Condición de pago
+        fk_multicurrency: 0, // Moneda predeterminada
+      }),
     });
 
-    console.log("Estado de la respuesta:", response.status, response.statusText);
+    // Validar respuesta del servidor
+    const orderData = await orderResponse.json();
 
-    // Intentar capturar y analizar la respuesta JSON
-    const responseText = await response.text();
-    console.log("Respuesta del servidor (texto):", responseText);
-
-    if (!response.ok) {
-      try {
-        const errorData = JSON.parse(responseText); // Intentar parsear el error si es JSON
-        console.error('Error al iniciar sesión en el backend:', errorData);
-      } catch (jsonError) {
-        console.error('Error al analizar la respuesta:', jsonError);
-      }
+    if (!orderResponse.ok) {
+      console.error('Error al crear la orden:', orderData);
       return;
     }
 
-    // Parsear la respuesta en caso de éxito
-    const data = JSON.parse(responseText);
-    console.log('Inicio de sesión exitoso. Token recibido:', data.token);
+    const orderId = orderData.id;
+
+    if (!orderId) {
+      console.error('El ID de la orden no fue devuelto:', orderData);
+      return;
+    }
+
+    console.log(`Orden creada exitosamente con ID: ${orderId}`);
+
+    // Confirmar en el log que la orden se encuentra en Dolibarr
+    console.log(`Revisa en Dolibarr el pedido con ID: ${orderId}`);
+
   } catch (error) {
-    console.error("Error al conectar con el backend:", error);
+    console.error('Error al conectar con la API de Dolibarr:', error);
   }
 };
 
-testLogin();
+createOrderWithProducts();

@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import About from './About'; 
-import Sidebar from './Sidebar'; // Importamos la barra lateral
+import Sidebar from './Sidebar';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';
 import ProductCard from './ProductCard';
@@ -11,47 +11,77 @@ import Cart from './Cart';
 import IniciarSesion from './Iniciar-sesion'
 import Registro from './Registro';
 import DataUser from './DataUser';
+import { AuthProvider, useAuth } from './AuthContext';
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <header>
-          <nav>
-            <ul className="menu">
-              <li style={{ color:"white" , margin: '0', fontSize: '1.8em', fontWeight: 'bold', flex: '1' }}>
-                <a href="/" style={{ color: 'white', textDecoration: 'none' }}>TechHardware Pro</a>
-              </li>
-              <li><a href="/">Inicio</a></li>
-              <li><a href="/productos">Productos</a></li>
-              <li><a href="/contacto">Contacto</a></li>
-              <li><a href="/aviso-privacidad">Aviso de Privacidad</a></li>
-              <li><a href="/politica-garantia">Política de Garantía</a></li>
-              <li><a href="/Iniciar-sesion">Iniciar Sesión</a></li>
-              <li className="carrito">
-                <a href="/carrito">Carrito</a>
-              </li>
-            </ul>
-          </nav>
-        </header>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/productos" element={<ProductsPage />} />
-          <Route path="/contacto" element={<Contacto />} />
-          <Route path="/acerca-de" element={<About />} />
-          <Route path="/aviso-privacidad" element={<AvisoPrivacidad />} />
-          <Route path="/politica-garantia" element={<PoliticaGarantia />} />
-          <Route path="/Iniciar-sesion" element={<IniciarSesion />} />
-          <Route path="/carrito" element={<Cart />} /> {/* Ruta para el carrito */}
-          <Route path="/producto/:id" element={<ProductDetail />} />
-          <Route path="/registro" element={<Registro />} />
-          <Route path="/datauser" element={<DataUser />}/>
-
-        </Routes>
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div className="App">
+          <header>
+            <nav>
+              <ul className="menu">
+                <li style={{ color:"white" , margin: '0', fontSize: '1.8em', fontWeight: 'bold', flex: '1' }}>
+                  <a href="/" style={{ color: 'white', textDecoration: 'none' }}>TechHardware Pro</a>
+                </li>
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/productos">Productos</a></li>
+                <li><a href="/contacto">Contacto</a></li>
+                <li><a href="/aviso-privacidad">Aviso de Privacidad</a></li>
+                <li><a href="/politica-garantia">Política de Garantía</a></li>
+                
+                {/* Mostrar dinámicamente según autenticación */}
+                <AuthMenu />
+                
+                <li className="carrito">
+                  <a href="/carrito">Carrito</a>
+                </li>
+              </ul>
+            </nav>
+          </header>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/productos" element={<ProductsPage />} />
+            <Route path="/contacto" element={<Contacto />} />
+            <Route path="/acerca-de" element={<About />} />
+            <Route path="/aviso-privacidad" element={<AvisoPrivacidad />} />
+            <Route path="/politica-garantia" element={<PoliticaGarantia />} />
+            <Route path="/Iniciar-sesion" element={<IniciarSesion />} />
+            <Route path="/carrito" element={<Cart />} />
+            <Route path="/producto/:id" element={<ProductDetail />} />
+            <Route path="/registro" element={<Registro />} />
+            <Route path="/datauser" element={<DataUser />} />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
+
+const AuthMenu = () => {
+  const { auth, logout } = useAuth(); // Accedemos al estado global de autenticación
+
+  return auth.isAuthenticated ? (
+    <>
+      <li><a href="/datauser">Cuenta</a></li>
+      <li>
+        <button 
+          onClick={logout} 
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#007bff',
+            cursor: 'pointer',
+            textDecoration: 'underline'
+          }}>
+          Cerrar Sesión
+        </button>
+      </li>
+    </>
+  ) : (
+    <li><a href="/Iniciar-sesion">Iniciar Sesión</a></li>
+  );
+};
 
 
 // Componente para la página de Inicio
@@ -107,11 +137,33 @@ function ProductsPage() {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
   const [productosFiltrados, setProductosFiltrados] = useState([]);
 
+  // URL de la API de Dolibarr
+  const DOLIBARR_API_URL = 'http://54.204.75.162/dolibarr/htdocs/api/index.php/products';
+  const DOLAPIKEY = 'U4B1Chw019IdhOQxJPVs52Jn5Iju37mn';
+
   useEffect(() => {
-    fetch('http://localhost:3005/productos')
-      .then(response => response.json())
-      .then(data => setProductos(data)) 
-      .catch(error => console.error("Error cargando productos:", error));
+    const fetchProductos = async () => {
+      try {
+        const response = await fetch(DOLIBARR_API_URL, {
+          method: 'GET',
+          headers: {
+            'DOLAPIKEY': DOLAPIKEY,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al cargar los productos desde Dolibarr');
+        }
+
+        const data = await response.json();
+        setProductos(data);
+      } catch (error) {
+        console.error('Error cargando productos:', error);
+      }
+    };
+
+    fetchProductos();
   }, []);
 
   useEffect(() => {
@@ -121,15 +173,20 @@ function ProductsPage() {
   }, [categoriaSeleccionada, productos]);
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div style={{ display: 'flex', height: '100vh' }}>
       {/* Sidebar con ancho fijo */}
-      <Sidebar setCategoriaSeleccionada={setCategoriaSeleccionada} />
+      <div style={{
+        width: '250px',
+        backgroundColor: '#f8f9fa',
+        padding: '10px',
+        boxShadow: '2px 0 5px rgba(0, 0, 0, 0.1)'
+      }}>
+        <Sidebar setCategoriaSeleccionada={setCategoriaSeleccionada} />
+      </div>
 
       <main style={{
         flexGrow: 1, // Ocupa el espacio restante al lado del sidebar
-        marginLeft: '50px',
-        marginTop: '5px',
-        padding: '20px'
+        padding: '50px',
       }}>
         <h1>Productos - {categoriaSeleccionada || "Todas las categorías"}</h1>
         <p>Aquí puedes encontrar diferentes componentes para computadoras.</p>
