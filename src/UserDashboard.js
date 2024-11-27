@@ -14,16 +14,17 @@ const states = {
 function UserDashboard() {
   const [activeSection, setActiveSection] = useState('Usuario');
   const [userData, setUserData] = useState(null);
+  const [bankAccounts, setBankAccounts] = useState([]);
 
   // Función para obtener los datos del usuario desde el backend
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const token = localStorage.getItem('token'); // Recuperar el token del almacenamiento local
+        const token = localStorage.getItem('token');
         const response = await fetch('http://localhost:3005/api/user/datos', {
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${token}`, // Enviar el token en el encabezado
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
@@ -33,14 +34,38 @@ function UserDashboard() {
         }
 
         const data = await response.json();
-        setUserData(data); // Guardar los datos del usuario en el estado
+        setUserData(data);
+
+        if (data?.id) {
+          fetchBankAccounts(data.id);
+        }
       } catch (error) {
         console.error('Error al obtener los datos del usuario:', error);
       }
     };
 
+    const fetchBankAccounts = async (userId) => {
+      try {
+        const response = await fetch(`http://localhost:3005/api/${userId}/bankaccounts`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al obtener cuentas bancarias');
+        }
+
+        const accounts = await response.json();
+        setBankAccounts(accounts);
+      } catch (error) {
+        console.error('Error al obtener cuentas bancarias:', error);
+      }
+    };
+
     fetchUserData();
-  }, []); // Ejecutar solo una vez al cargar el componente
+  }, []);
 
   const renderContent = () => {
     switch (activeSection) {
@@ -61,7 +86,7 @@ function UserDashboard() {
           {/* Imagen del usuario o ícono */}
           {userData ? (
             <img
-              src={`http://54.204.75.162/dolibarr/htdocs/document.php?modulepart=societe&entity=1&file=1%2F${userData.name}.png`}
+              src={userData.url}
               alt="Usuario"
               onError={(e) => (e.target.src = '')} // Borra la imagen si no se encuentra
               style={{
@@ -149,7 +174,38 @@ function UserDashboard() {
       case 'Devoluciones':
         return <p>Devoluciones: aquí puedes gestionar tus solicitudes de devolución.</p>;
       case 'Métodos de Pago':
-        return <p>Métodos de Pago: aquí puedes administrar tus tarjetas y métodos de pago.</p>;
+        return (
+          <div style={{ padding: '20px' }}>
+           
+            {bankAccounts.length > 0 ? (
+              <div style={{ marginTop: '20px' }}>
+                <h3>Cuentas Bancarias</h3>
+                {bankAccounts.map((account) => (
+                  <div key={account.id} style={{ borderBottom: '1px solid #ddd', padding: '10px 0' }}>
+                    <p><strong>Banco:</strong> {account.bank || 'No especificado'}</p>
+                    <p><strong>Nombre de la Tarjeta:</strong> {account.label   || 'No disponible'}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No se encontraron cuentas bancarias registradas.</p>
+            )}
+            <button
+              style={{
+                marginTop: '20px',
+                padding: '10px 20px',
+                backgroundColor: '#28a745',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+              }}
+              onClick={() => alert('Función para agregar nueva cuenta en desarrollo')}
+            >
+              Agregar Nueva Cuenta
+            </button>
+          </div>
+        );
       case 'Facturas':
         return <p>Facturas: aquí puedes consultar y descargar tus facturas.</p>;
       default:

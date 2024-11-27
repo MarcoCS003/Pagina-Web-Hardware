@@ -12,6 +12,8 @@ import IniciarSesion from './Iniciar-sesion'
 import Registro from './Registro';
 import DataUser from './DataUser';
 import { AuthProvider, useAuth } from './AuthContext';
+import Checkout from './continuar';
+import ConfirmarMetodoPago from './continuarPago';
 
 function App() {
   return (
@@ -50,7 +52,9 @@ function App() {
             <Route path="/carrito" element={<Cart />} />
             <Route path="/producto/:id" element={<ProductDetail />} />
             <Route path="/registro" element={<Registro />} />
+            <Route path='/checkout' element = {<Checkout/>}/>
             <Route path="/datauser" element={<DataUser />} />
+            <Route path="/continuarPago" element={<ConfirmarMetodoPago />} />
           </Routes>
         </div>
       </Router>

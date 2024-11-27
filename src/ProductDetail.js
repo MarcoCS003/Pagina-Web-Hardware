@@ -5,10 +5,31 @@ function ProductDetail() {
   const { id } = useParams();
   const [producto, setProducto] = useState(null);
   const [mainImage, setMainImage] = useState(1);
+  const [showToast, setShowToast] = useState(false);
 
   // Configuración de la API de Dolibarr
   const DOLIBARR_API_URL = 'http://54.204.75.162/dolibarr/htdocs/api/index.php/products';
   const DOLAPIKEY = 'U4B1Chw019IdhOQxJPVs52Jn5Iju37mn';
+  const añadirAlCarrito = async (productoId, cantidad) => {
+    try {
+      const response = await fetch('http://localhost:3005/api/carrito/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: 1, productoId, cantidad }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Error al añadir al carrito');
+      }
+  
+      const data = await response.json();
+      console.log('Carrito actualizado:', data.carrito);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    } catch (error) {
+      console.error('Error al añadir producto al carrito:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchProducto = async () => {
@@ -39,6 +60,7 @@ function ProductDetail() {
   if (!producto) {
     return <p>Cargando...</p>;
   }
+
 
   // Generar URLs para imágenes
   const imageUrls = Array.from({ length: 5 }, (_, i) => 
@@ -101,17 +123,20 @@ function ProductDetail() {
               }}>
                 Comprar Ahora
               </button>
-              <button style={{
-                padding: '10px 20px',
-                fontSize: '1em',
-                backgroundColor: '#007bff',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer'
-              }}>
-                Añadir a Carrito
-              </button>
+              <button
+                onClick={() => añadirAlCarrito(producto.id, 1)}
+                style={{
+                  padding: '10px 20px',
+                  fontSize: '1em',
+                  backgroundColor: '#007bff',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+              }}
+              >
+              Añadir a Carrito
+                </button>
             </div>
           </div>
         </div>
@@ -141,7 +166,47 @@ function ProductDetail() {
           <div dangerouslySetInnerHTML={{ __html: producto.description }} />
         </div>
       </div>
+          {/* Animación lateral */}
+          {showToast && (
+  <div
+    style={{
+      position: 'fixed',
+      top: '20px',
+      right: '20px',
+      backgroundColor: '#ffffff',
+      color: '#333',
+      padding: '15px',
+      borderRadius: '12px',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+      animation: 'slideIn 0.5s ease',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      borderLeft: '5px solid #28a745',
+    }}
+  >
+    <img
+      src={imageUrls[0]}
+      style={{
+        width: '60px',
+        height: '60px',
+        borderRadius: '50%',
+        border: '1px solid #ddd',
+        objectFit: 'cover',
+      }}
+    />
+    <div>
+      <p style={{ fontSize: '0.9em', margin: '0', color: '#555' }}>¡Añadido al carrito!</p>
+      <strong style={{ fontSize: '1em', color: '#333' }}>{producto.ref}</strong>
+      <p style={{ fontSize: '1em', margin: '0', color: '#28a745', fontWeight: 'bold' }}>
+        ${Math.round(producto.price)}
+      </p>
     </div>
+  </div>
+)}
+      
+    </div>
+
   );
 }
 

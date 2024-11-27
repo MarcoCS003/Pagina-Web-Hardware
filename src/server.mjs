@@ -4,7 +4,7 @@ import cors from 'cors'; // Importa CORS
 
 const app = express();
 const PORT = 3002;
-const apiURL = 'http://54.204.75.162/dolibarr/htdocs/api/index.php/products';
+const apiURL = 'http://54.204.75.162/dolibarr/htdocs/api/index.php/orders';
 const apiToken = 'U4B1Chw019IdhOQxJPVs52Jn5Iju37mn';
 
 app.use(cors());
