@@ -132,14 +132,14 @@ function Cart() {
                 style={{
                   width: '100px',
                   height: '100px',
-                  backgroundColor: '#f0f0f0',
+                  backgroundColor: 'white',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
                 <img
-                  src={`http://54.204.75.162/dolibarr/htdocs/document.php?modulepart=produit&entity=1&file=${producto.ref}%2F${producto.ref}1.png`}
+                  src={producto.url}
                   alt={producto.label}
                   style={{ maxWidth: '100%', maxHeight: '100%' }}
                 />

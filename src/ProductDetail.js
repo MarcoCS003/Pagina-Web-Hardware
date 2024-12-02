@@ -186,7 +186,7 @@ function ProductDetail() {
     }}
   >
     <img
-      src={imageUrls[0]}
+      src={producto.url}
       style={{
         width: '60px',
         height: '60px',
@@ -211,4 +211,3 @@ function ProductDetail() {
 }
 
 export default ProductDetail;
-

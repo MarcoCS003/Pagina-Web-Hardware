@@ -1,35 +1,25 @@
-import fetch from 'node-fetch';
+const API_URL = 'http://54.204.75.162/dolibarr/api/index.php';
+const TOKEN = 'U4B1Chw019IdhOQxJPVs52Jn5Iju37mn'; // Obtén este token en el paso de autenticación.
 
-const testCreateOrder = async () => {
+async function getProductDocuments(productId) {
   try {
-    // Datos de prueba
-    const userId = 2; // ID del usuario de prueba
-    const apiUrl = 'http://localhost:3005/api/create-order'; // Endpoint del backend
-
-    // Enviar solicitud al backend
-    const response = await fetch(apiUrl, {
-      method: 'POST',
+    const response = await fetch(`${API_URL}/products/${productId}/documents`, {
+      method: 'GET',
       headers: {
+        Authorization: `Bearer ${TOKEN}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userId }), // Enviar el userId en el cuerpo de la solicitud
     });
 
-    // Parsear respuesta
-    const data = await response.json();
-
-    // Validar respuesta
     if (!response.ok) {
-      console.error('Error al crear la orden:', data);
-    } else {
-      console.log('Orden creada con éxito:', data);
+      throw new Error(`Error: ${response.status} - ${response.statusText}`);
     }
+
+    const data = await response.json();
+    console.log('Documentos:', data);
   } catch (error) {
-    console.error('Error al conectar con el backend:', error);
+    console.error('Error al obtener documentos:', error.message);
   }
-};
+}
 
-// Ejecutar prueba
-testCreateOrder();
-
-
+getProductDocuments(19); // Cambia 1 por el ID del producto.

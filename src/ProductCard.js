@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 
 function ProductCard({ producto }) {
   // Construye la URL de la imagen utilizando el campo 'ref' del producto
-  const imageUrl = `http://54.204.75.162/dolibarr/htdocs/document.php?modulepart=produit&entity=1&file=${producto.ref}%2F${producto.ref}1.png`;
+  const imageUrl = producto.url;
+  
 
   // Reemplazar los guiones bajos por espacios
   const formattedName = producto.ref.replace(/_/g, ' ');
@@ -24,7 +25,7 @@ function ProductCard({ producto }) {
         <div style={{
           width: '100%',
           height: '150px',
-          backgroundColor: '#f0f0f0',
+          backgroundColor: 'white',
           marginBottom: '10px',
           display: 'flex',
           alignItems: 'center',
