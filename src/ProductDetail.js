@@ -194,6 +194,7 @@ function ProductDetail() {
         border: '1px solid #ddd',
         objectFit: 'cover',
       }}
+      alt="Descripción de la imagen"
     />
     <div>
       <p style={{ fontSize: '0.9em', margin: '0', color: '#555' }}>¡Añadido al carrito!</p>

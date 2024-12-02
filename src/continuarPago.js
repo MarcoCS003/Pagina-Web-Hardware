@@ -14,7 +14,7 @@ function ConfirmarMetodoPago() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(false)
+  const [setLoading] = useState(false)
 
   const DOLAPIKEY = 'U4B1Chw019IdhOQxJPVs52Jn5Iju37mn';
 
