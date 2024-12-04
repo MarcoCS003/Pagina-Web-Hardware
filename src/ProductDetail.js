@@ -6,10 +6,11 @@ function ProductDetail() {
   const [producto, setProducto] = useState(null);
   const [mainImage, setMainImage] = useState(1);
   const [showToast, setShowToast] = useState(false);
+  const [imageUrls, setImageUrls] = useState([]);
 
   // Configuración de la API de Dolibarr
-  const DOLIBARR_API_URL = 'http://54.204.75.162/dolibarr/htdocs/api/index.php/products';
-  const DOLAPIKEY = 'U4B1Chw019IdhOQxJPVs52Jn5Iju37mn';
+  const DOLIBARR_API_URL = 'http://13.59.29.166/dolibarr/htdocs/api/index.php/products';
+  const DOLAPIKEY = 'ict3vf9SK8sN46Mz5wJqUG0UIi23dE8R';
   const añadirAlCarrito = async (productoId, cantidad) => {
     try {
       const response = await fetch('http://localhost:3005/api/carrito/add', {
@@ -34,38 +35,50 @@ function ProductDetail() {
   useEffect(() => {
     const fetchProducto = async () => {
       try {
-        // Realizamos la solicitud para obtener los datos del producto por ID
-        const response = await fetch(`${DOLIBARR_API_URL}/${id}`, {
+        // Obtener datos del producto desde Dolibarr
+        const responseProducto = await fetch(`${DOLIBARR_API_URL}/${id}`, {
           method: 'GET',
           headers: {
             'DOLAPIKEY': DOLAPIKEY,
             'Content-Type': 'application/json',
           },
         });
-
-        if (!response.ok) {
+  
+        if (!responseProducto.ok) {
           throw new Error('Error al cargar el producto desde Dolibarr');
         }
-
-        const data = await response.json();
-        setProducto(data); // Guardamos el producto en el estado
+  
+        const dataProducto = await responseProducto.json();
+        setProducto(dataProducto); // Guardamos los datos del producto
+  
+        // Obtener documentos relacionados con el producto (imágenes)
+        const responseDocuments = await fetch(`http://13.59.29.166/dolibarr/htdocs/api/index.php/documents?modulepart=product&id=${id}&sortfield=fullname&sortorder=acs`, {
+          method: 'GET',
+          headers: {
+            'DOLAPIKEY': DOLAPIKEY,
+            'Content-Type': 'application/json',
+          },
+        });
+  
+        if (!responseDocuments.ok) {
+          throw new Error('Error al cargar los documentos desde Dolibarr');
+        }
+  
+        const dataDocuments = await responseDocuments.json();
+        const imageUrls = dataDocuments.map(doc => `http://13.59.29.166/dolibarr/htdocs/document.php?hashp=${doc.share}`);
+        setImageUrls(imageUrls); // Guardamos las URLs de las imágenes
       } catch (error) {
-        console.error('Error cargando producto:', error);
+        console.error('Error cargando datos:', error);
       }
     };
-
+  
     fetchProducto();
   }, [id]);
 
+  
   if (!producto) {
     return <p>Cargando...</p>;
   }
-
-
-  // Generar URLs para imágenes
-  const imageUrls = Array.from({ length: 5 }, (_, i) => 
-    `http://54.204.75.162/dolibarr/htdocs/document.php?modulepart=produit&entity=1&file=${producto.ref}%2F${producto.ref}${i + 1}.png`
-  );
 
   // Calcular costo de envío
   const envio = producto.price > 1000 ? 'Envío gratis' : '$90 de envío';

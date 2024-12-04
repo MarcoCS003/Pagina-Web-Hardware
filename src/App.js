@@ -142,8 +142,8 @@ function ProductsPage() {
   const [productosFiltrados, setProductosFiltrados] = useState([]);
 
   // URL de la API de Dolibarr
-  const DOLIBARR_API_URL = 'http://54.204.75.162/dolibarr/htdocs/api/index.php/products';
-  const DOLAPIKEY = 'U4B1Chw019IdhOQxJPVs52Jn5Iju37mn';
+  const DOLIBARR_API_URL = 'http://13.59.29.166/dolibarr/htdocs/api/index.php/products';
+  const DOLAPIKEY = 'ict3vf9SK8sN46Mz5wJqUG0UIi23dE8R';
 
   useEffect(() => {
     const fetchProductos = async () => {

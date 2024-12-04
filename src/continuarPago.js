@@ -16,7 +16,7 @@ function ConfirmarMetodoPago() {
 
   const [setLoading] = useState(false)
 
-  const DOLAPIKEY = 'U4B1Chw019IdhOQxJPVs52Jn5Iju37mn';
+  const DOLAPIKEY = 'ict3vf9SK8sN46Mz5wJqUG0UIi23dE8R';
 
 const crearOrden = async () => {
   setLoading(true); // Mostrar indicador de carga
@@ -55,7 +55,7 @@ const crearOrden = async () => {
     };
 
     // Enviar la solicitud para crear la orden en Dolibarr
-    const orderResponse = await fetch('http://54.204.75.162/dolibarr/htdocs/api/index.php/orders', {
+    const orderResponse = await fetch('http://13.59.29.166/dolibarr/htdocs/api/index.php/orders', {
       method: 'POST',
       headers: {
         'DOLAPIKEY': DOLAPIKEY,

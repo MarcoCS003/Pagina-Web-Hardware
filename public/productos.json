@@ -148,6 +148,11 @@
     { "id": 147, "nombre": "Kingston HyperX Predator 32GB", "precio": 159.99, "marca": "Kingston", "descripcion": "Memoria DDR4 de alto rendimiento para gaming", "categoria": "Memoria RAM", "stock": 18 },
     { "id": 148, "nombre": "TeamGroup T-Force Vulcan Z 16GB", "precio": 69.99, "marca": "TeamGroup", "descripcion": "Memoria DDR4 con diseño elegante", "categoria": "Memoria RAM", "stock": 25 },
     { "id": 149, "nombre": "Samsung 860 EVO 500GB", "precio": 59.99, "marca": "Samsung", "descripcion": "SSD de 2.5 pulgadas ideal para almacenamiento rápido", "categoria": "Discos Duros", "stock": 40 },
-    { "id": 150, "nombre": "Crucial P5 1TB", "precio": 114.99, "marca": "Crucial", "descripcion": "SSD NVMe de alto rendimiento", "categoria": "Discos Duros", "stock": 20 }
+    { "id": 150, "nombre": "Crucial P5 1TB", "precio": 114.99, "marca": "Crucial", "descripcion": "SSD NVMe de alto rendimiento", "categoria": "Discos Duros", "stock": 20 },
+    { "linkedObjectsFullLoaded": ["http://54.204.75.162/dolibarr/htdocs/document.php?hashp=y43n5MqVD6z4Z6ezjj8GDa38J9GXglIV",
+     "http://54.204.75.162/dolibarr/htdocs/document.php?hashp=ZxvdN25fA9r53ptJUKoGrCz1l532E9HC",
+    "http://54.204.75.162/dolibarr/htdocs/document.php?hashp=qG4eGLr88Z2a276pz6UK5hkDPNa6DvOh",
+     "http://54.204.75.162/dolibarr/htdocs/document.php?hashp=634BXo0Hj1KA2j2suJXk1YaUIErull52",
+      "http://54.204.75.162/dolibarr/htdocs/document.php?hashp=4jn5bPZn85HTh3a6JAO1Y19mBIb1dYza"] }
   ]
 }
